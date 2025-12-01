@@ -1,0 +1,25 @@
+#!/usr/bin/ruby
+
+require "json"
+require "time"
+
+$debug = nil
+
+begin
+  io = File.new("/usr/lib64/nagios/plugins/check_kvm.d/current.status")
+  a = JSON.load(io)
+rescue
+end
+
+if a.nil?
+  puts "KVM UNKNOWN - no information available"
+  exit 3
+end
+
+if a["timestamp"].to_i < (Time.now - 11*60).to_i
+  puts "KVM UNKNOWN - no up to date information available"
+  exit 3
+end
+
+puts a["status"]
+exit a["value"].to_i

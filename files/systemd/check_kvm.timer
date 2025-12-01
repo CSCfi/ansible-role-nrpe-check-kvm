@@ -1,0 +1,10 @@
+[Unit]
+Description=Get the latest KVM information every five minutes
+
+[Timer]
+OnCalendar=*:03/5
+Unit=check_kvm.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

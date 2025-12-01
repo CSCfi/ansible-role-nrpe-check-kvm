@@ -1,0 +1,50 @@
+---
+# tasks file for ansible-role-nrpe-check-kvm
+- name: Install requirements for selinux
+  package:
+    name: "{{ item }}"
+  loop:
+    - libsemanage-python3
+    - ruby
+    - jq
+
+- name: Configure selinux for nrpe
+  seboolean:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    persistent: yes
+  when: ansible_facts.selinux.status == 'enabled'
+  loop:
+  - { name: nagios_run_sudo, state: no }
+
+- name: Copy files for check_kvm
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ nrpe_check_location }}{{ item.dest }}"
+    group: "{{ item.group }}"
+    owner: "{{ item.owner }}"
+    mode: "{{ item.mode }}"
+  loop:
+  - { src: bin/check_kvm, dest: check_kvm, owner: nrpe, group: nrpe, mode: 555}
+  - { src: bin/get_kvm_status, dest: check_kvm.d/bin/, group: root, owner: root, mode: 755 }
+  - { src: update, dest: check_kvm.d/update, group: root, owner: root, mode: 755 }
+  - { src: systemd/check_kvm.service, dest: check_kvm.d/systemd/, group: root, owner: root, mode: 644 }
+  - { src: systemd/check_kvm.timer, dest: check_kvm.d/systemd/, group: root, owner: root, mode: 644 }
+
+- name: Create a symbolic links for check_kvm systemd processes
+  file:
+    src: '{{ nrpe_check_location }}check_kvm.d/systemd/{{ item.file }}'
+    dest: /etc/systemd/system/{{ item.file }}
+    owner: root
+    group: root
+    state: link
+  loop:
+  - { file: check_kvm.service }
+  - { file: check_kvm.timer }
+
+- name: Force systemd to reread configs
+  systemd:
+    name: check_kvm.timer
+    state: started
+    enabled: yes
+    daemon_reload: yes

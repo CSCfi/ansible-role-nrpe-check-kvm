@@ -1,0 +1,7 @@
+#!/bin/bash
+CHECKKVMDIR=/usr/lib64/nagios/plugins/check_kvm.d
+
+$CHECKKVMDIR/bin/get_kvm_status > $CHECKKVMDIR/current.status.new || exit 1
+mv -f $CHECKKVMDIR/current.status.new $CHECKKVMDIR/current.status || exit 1
+
+exit 0
