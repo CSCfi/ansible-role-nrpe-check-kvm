@@ -20,20 +20,20 @@
 - name: Copy files for check_kvm
   copy:
     src: "{{ item.src }}"
-    dest: "{{ nrpe_check_location }}{{ item.dest }}"
+    dest: "{{ item.dest }}"
     group: "{{ item.group }}"
     owner: "{{ item.owner }}"
     mode: "{{ item.mode }}"
   loop:
-  - { src: bin/check_kvm, dest: check_kvm, owner: nrpe, group: nrpe, mode: 555}
-  - { src: bin/get_kvm_status, dest: check_kvm.d/bin/, group: root, owner: root, mode: 755 }
-  - { src: update, dest: check_kvm.d/update, group: root, owner: root, mode: 755 }
-  - { src: systemd/check_kvm.service, dest: check_kvm.d/systemd/, group: root, owner: root, mode: 644 }
-  - { src: systemd/check_kvm.timer, dest: check_kvm.d/systemd/, group: root, owner: root, mode: 644 }
+  - { src: bin/check_kvm, dest: "{{ nrpe_check_location }}check_kvm", owner: nrpe, group: nrpe, mode: 555}
+  - { src: bin/get_kvm_status, dest: /opt/check_kvm.d/bin/, group: root, owner: root, mode: 755 }
+  - { src: update, dest: /opt/check_kvm.d/update, group: root, owner: root, mode: 755 }
+  - { src: systemd/check_kvm.service, dest: /opt/check_kvm.d/systemd/, group: root, owner: root, mode: 644 }
+  - { src: systemd/check_kvm.timer, dest: /opt/check_kvm.d/systemd/, group: root, owner: root, mode: 644 }
 
 - name: Create a symbolic links for check_kvm systemd processes
   file:
-    src: '{{ nrpe_check_location }}check_kvm.d/systemd/{{ item.file }}'
+    src: '/opt/check_kvm.d/systemd/{{ item.file }}'
     dest: /etc/systemd/system/{{ item.file }}
     owner: root
     group: root

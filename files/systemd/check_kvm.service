@@ -3,4 +3,4 @@ Description=Get the latest KVM status information
 
 [Service]
 Type=simple
-ExecStart=/usr/lib64/nagios/plugins/check_kvm.d/update
+ExecStart=/opt/check_kvm.d/update

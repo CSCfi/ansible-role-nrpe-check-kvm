@@ -6,7 +6,7 @@ require "time"
 $debug = nil
 
 begin
-  io = File.new("/usr/lib64/nagios/plugins/check_kvm.d/current.status")
+  io = File.new("/opt/check_kvm.d/current.status")
   a = JSON.load(io)
 rescue
 end
